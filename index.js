@@ -211,12 +211,12 @@ async function run() {
 
 
         // agent add
-        app.get('/add', async(req, res) => {
+        app.get('/add', async (req, res) => {
             const result = await agentAddCollection.find().toArray();
             res.send(result);
         })
 
-        app.post('/add', async(req, res) => {
+        app.post('/add', async (req, res) => {
             const add = req.body;
             const result = await agentAddCollection.insertOne(add);
             res.send(result)
@@ -245,6 +245,34 @@ async function run() {
             const result = await agentAddCollection.updateOne(filter, updateDoc);
             res.send(result)
         })
+
+
+        app.patch('/add/:id', async (req, res) => {
+            const item = req.body;
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const updateDoc = {
+                $set: {
+                    image: item.image,
+                    title: item.title,
+                    name: item.name,
+                    email: item.email,
+                    maxPrice: item.maxPrice,
+                    minPrice: item.minPrice,
+                }
+            }
+            const result = await agentAddCollection.updateOne(filter, updateDoc)
+            res.send(result);
+        })
+
+        app.delete('/add/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await agentAddCollection.deleteOne(query);
+            res.send(result)
+        })
+
+
 
 
 
