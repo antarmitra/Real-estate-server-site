@@ -75,10 +75,10 @@ async function run() {
 
 
         // advertisement 
-        app.get('/advertisement', async (req, res) => {
-            const result = await propertyCollection.find().toArray();
-            res.send(result)
-        })
+        // app.get('/advertisement', async (req, res) => {
+        //     const result = await propertyCollection.find().toArray();
+        //     res.send(result)
+        // })
 
 
         // Add Property
@@ -87,9 +87,17 @@ async function run() {
             res.send(result)
         })
 
+
+        app.get('/addProperty/user', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const result = await propertyAddCollection.find(query).toArray();
+            res.send(result)
+        })
+
+
         app.post('/addProperty', async (req, res) => {
             const add = req.body;
-            console.log(add);
             const result = await propertyAddCollection.insertOne(add);
             res.send(result)
         })
@@ -102,12 +110,29 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/review/user', async(req, res) => {
+            const email = req.query.email;
+            const query = {email: email};
+            const result = await reviewCollection.find(query).toArray();
+            res.send(result)
+        })  
+
 
         app.post('/review', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
             res.send(result);
         })
+
+        app.delete('/review/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result)
+        })
+
+        
+
 
         // userssdsssssssssss
         app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
