@@ -102,6 +102,13 @@ async function run() {
             res.send(result)
         })
 
+        app.delete('/addProperty/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await propertyAddCollection.deleteOne(query);
+            res.send(result)
+        })
+
 
         // review 
         app.get('/review', async (req, res) => {
@@ -110,12 +117,12 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/review/user', async(req, res) => {
+        app.get('/review/user', async (req, res) => {
             const email = req.query.email;
-            const query = {email: email};
+            const query = { email: email };
             const result = await reviewCollection.find(query).toArray();
             res.send(result)
-        })  
+        })
 
 
         app.post('/review', async (req, res) => {
@@ -131,7 +138,7 @@ async function run() {
             res.send(result)
         })
 
-        
+
 
 
         // userssdsssssssssss
@@ -223,7 +230,6 @@ async function run() {
             }
             const result = await userCollection.updateOne(query, updateDoc)
             res.send(result)
-
         })
 
 
@@ -236,10 +242,40 @@ async function run() {
 
 
         // agent add
-        app.get('/add', async (req, res) => {
+
+        app.get('/add/property', async (req, res) => {
             const result = await agentAddCollection.find().toArray();
-            res.send(result);
+            res.send(result)
         })
+
+        app.get('/add', async (req, res) => {
+            try {
+                const filter = req.query;
+                console.log(filter);
+
+                // Construct the query for title search
+                const query = {
+                    title: { $regex: filter.search, $options: 'i' }
+                };
+
+                // Construct options for sorting
+                const options = {
+                    sort: {
+                        maxPrice: filter.sort === 'asc' ? 1 : -1
+                    }
+                };
+
+                // Fetch data from MongoDB collection
+                const result = await agentAddCollection.find(query, options).toArray();
+
+                // Send the result to the client
+                res.send(result);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                res.status(500).send("Internal Server Error");
+            }
+        });
+
 
         app.post('/add', async (req, res) => {
             const add = req.body;
@@ -297,13 +333,6 @@ async function run() {
             res.send(result)
         })
 
-
-
-
-
-
-
-
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -313,8 +342,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
 
 
 app.get('/', (req, res) => {
